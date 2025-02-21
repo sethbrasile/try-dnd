@@ -12,15 +12,12 @@ onMounted(() => {
   const manager = new DragDropManager();
   const wrapper = document.querySelector('.drag-drop-area');
 
-  if (!wrapper) {
-    return;
-  }
-
-  props.images.forEach((image, index) => {
+  props.images.forEach((imageId, index) => {
     const element = document.createElement('img');
-    element.src = image;
+    element.src = `https://picsum.photos/id/${imageId}/200`;
+    element.id = imageId;
     new Sortable({
-      id: `image-${index}`,
+      id: imageId,
       index,
       element,
       transition: {
@@ -30,7 +27,16 @@ onMounted(() => {
       }
     }, manager);
 
-    wrapper.appendChild(element);
+    wrapper?.appendChild(element);
+
+    manager.monitor.addEventListener('dragend', (event) => {
+      const { source, target, canceled } = event.operation;
+      if (!canceled && target) {
+        // would update data here but source and target ID are the same?
+        // bug? doing something wrong? this lib isn't 1.0 yet
+        console.log(source?.id, target.id);
+      }
+    });
   });
 })
 </script>
